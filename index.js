@@ -16,6 +16,7 @@ image.src = './images/elletTown.png'
 const playerImage = new Image()
 playerImage.src = './images/playerDown.png'
 
+//BASE CLASS
 class Sprite {
     constructor({position, velocity, image}) {
         this.position = position
@@ -23,10 +24,11 @@ class Sprite {
     }
 
     draw() {
-        c.drawImage(this.image, -735, -600)
+        c.drawImage(this.image, this.position.x, this.position.y)
     }
 }
 
+//BG IMAGE
 const background = new Sprite({
     position: {
         x: -735,
@@ -35,6 +37,21 @@ const background = new Sprite({
     image: image
 })
 
+const keys = {
+    w: {
+        pressed: false
+    },
+    a: {
+        pressed: false
+    },
+    s: {
+        pressed: false
+    },
+    d: {
+        pressed: false
+    },
+}
+//REFRESH ANIMATION
 function animate() {
     window.requestAnimationFrame(animate)
     console.log('animate')
@@ -53,24 +70,64 @@ function animate() {
         playerImage.height
     )
 
+    //HOTKEYS CONTROLL
+    if(keys.w.pressed && lastkey === 'w') background.position.y += 3 
+    else if(keys.a.pressed && lastkey === 'a') background.position.x += 3 
+    else if(keys.s.pressed && lastkey === 's') background.position.y -= 3 
+    else if(keys.d.pressed && lastkey === 'd') background.position.x -= 3 
+
+
 }
 animate()
 
+
+//HOTKEYS
+let lastkey = ''
 window.addEventListener('keydown', (e) => {
     switch(e.key) {
         case 'w':
+            lastkey = 'w'
+            keys.w.pressed = true
+        break
+        
+        case 'a':
+            keys.a.pressed = true
+            lastkey = 'a'
+        break
+
+        case 's':
+            keys.s.pressed = true
+            lastkey = 's'
+        break
+
+        case 'd':
+            keys.d.pressed = true
+            lastkey = 'd'
+        break
+
+    }
+
+})
+
+window.addEventListener('keyup', (e) => {
+    switch(e.key) {
+        case 'w':
             console.log('w press')
+            keys.w.pressed = false
         break
         
         case 'a':
             console.log('a press')
+            keys.a.pressed = false
         break
 
         case 's':
+            keys.s.pressed = false
             console.log('s press')
         break
 
         case 'd':
+            keys.d.pressed = false
             console.log('d press')
         break
 

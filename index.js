@@ -1,9 +1,67 @@
-console.log('asd')
+console.log(collisions)
 const canvas = document.querySelector('canvas')
 
 const c = canvas.getContext('2d')
 canvas.width = 1024
 canvas.height = 576
+
+
+//RENDER COLISSION map image size 70*40, row width = 70, render by 1 row, and got 40 columns = 40 arrays in colissionsMap array
+const collisionsMap = []
+for (let i = 0; i < collisions.length; i += 70) {
+    collisionsMap.push(collisions.slice(i, i + 70))
+}
+console.log(collisionsMap)
+
+
+
+
+//TILE CLASS
+class Boundary {
+//MAKE STATIC SIZE. OUR TILES 12*12, OUR MAP ZOOM 400%, MULTIPLE IT = 48*48
+    static width = 48
+    static height = 48
+    constructor({position}) {
+        this.position = position
+        this.width = 48
+        this.height = 48
+    }
+
+    draw() {
+        c.fillStyle = 'red'
+        c.fillRect(this.position.x, this.position.y, this.width, this.height)
+    }
+}
+
+
+
+//OFFSETS
+const offset = {
+    x: -735,
+    y: -620
+}
+
+const boundaries = []
+
+//sort each width array X position
+collisionsMap.forEach((row, i) => {
+    //sort each height array Y position, but not 0 empty value
+    row.forEach((symbol, j) => {
+        if(symbol === 1025) {
+            boundaries.push(
+                new Boundary ({
+                    //multiple Y=i and X=j cords for tile size 48                
+                    position:{
+                        x: j * Boundary.width + offset.x,
+                        y: i * Boundary.height + offset.y
+                    }
+                })
+            )
+        }        
+    })
+})
+
+console.log(boundaries)
 
 
 c.fillStyle = 'orange'
@@ -16,23 +74,61 @@ image.src = './images/elletTown.png'
 const playerImage = new Image()
 playerImage.src = './images/playerDown.png'
 
-//BASE CLASS
+
+//BASE CLASS SPRITE
 class Sprite {
-    constructor({position, velocity, image}) {
+    constructor({position, velocity, image, frames = {max: 1} }) {
         this.position = position
         this.image = image
+        this.frames = frames
+        
+        this.image.onload = () => {
+            this.width = this.image.width / this.frames.max
+            this.height = this.image.height
+
+            console.log(this.width)
+            console.log(this.height)
+        }
     }
 
     draw() {
-        c.drawImage(this.image, this.position.x, this.position.y)
+        // c.drawImage(this.image, this.position.x, this.position.y)
+        //draw player
+        c.drawImage(
+            this.image,
+            0,
+            0,
+            this.image.width / this.frames.max,
+            this.image.height, 
+
+            this.position.x,
+            this.position.y,
+
+            this.image.width / this.frames.max,
+            this.image.height
+        )        
     }
 }
+
+
+//PLAYER IMAGE
+const player = new Sprite({
+    position: {
+        //192*68 its player image(all position) file size
+        x: canvas.width / 2 - 192 / 4 / 2,
+        y: canvas.height / 2 - 68 / 2
+    },
+    image: playerImage,
+    frames: {
+        max: 4
+    }
+})
 
 //BG IMAGE
 const background = new Sprite({
     position: {
-        x: -735,
-        y: -600
+        x: offset.x,
+        y: offset.y
     },
     image: image
 })
@@ -51,30 +147,152 @@ const keys = {
         pressed: false
     },
 }
+
+//array of all movable const
+
+
+const movables = [background, ...boundaries]
+
+function rectangularColission ({rectangle1, rectangle2}) {
+    return (
+        rectangle1.position.x + rectangle1.width >= rectangle2.position.x &&
+        rectangle1.position.x <= rectangle2.position.x + rectangle2.width &&
+        
+        rectangle1.position.y <= rectangle2.position.y + rectangle2.height &&
+        rectangle1.position.y + rectangle1.height >= rectangle2.position.y 
+    )
+
+}
+
 //REFRESH ANIMATION
 function animate() {
     window.requestAnimationFrame(animate)
-    console.log('animate')
-
+    //draw BG map image
     background.draw()
 
-    c.drawImage(
-        playerImage,
-        0,
-        0,
-        playerImage.width / 4,
-        playerImage.height, 
-        canvas.width / 2 - playerImage.width / 4 / 2, 
-        canvas.height / 2 - playerImage.height / 2,
-        playerImage.width / 4,
-        playerImage.height
-    )
+    //draw colissions map
+    boundaries.forEach(boundary => {
+        boundary.draw()
+    })
 
-    //HOTKEYS CONTROLL
-    if(keys.w.pressed && lastkey === 'w') background.position.y += 3 
-    else if(keys.a.pressed && lastkey === 'a') background.position.x += 3 
-    else if(keys.s.pressed && lastkey === 's') background.position.y -= 3 
-    else if(keys.d.pressed && lastkey === 'd') background.position.x -= 3 
+    //draw player
+    player.draw()
+
+    
+
+
+////////////////////
+//HOTKEYS CONTROLL//
+////////////////////
+let moving = true
+
+    if(keys.w.pressed && lastkey === 'w') {
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i]
+            //how player connect with collision
+            if (
+                rectangularColission({
+                    rectangle1:player,
+                    rectangle2:{...boundary, 
+                        position: {
+                            x: boundary.position.x,
+                            y: boundary.position.y + 3
+                        }
+                    }
+                })
+            ) {console.log('colliding')
+                moving = false
+                break
+            }
+
+        }
+
+        if(moving) {
+            movables.forEach(movable => {movable.position.y += 3})
+        }
+    }
+    else if(keys.a.pressed && lastkey === 'a') {
+
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i]
+            //how player connect with collision
+            if (
+                rectangularColission({
+                    rectangle1:player,
+                    rectangle2:{...boundary, 
+                        position: {
+                            x: boundary.position.x + 3,
+                            y: boundary.position.y
+                        }
+                    }
+                })
+            ) {console.log('colliding')
+                moving = false
+                break
+            }
+
+        }
+
+        if(moving) {
+            movables.forEach(movable => {movable.position.x += 3})
+        }
+
+        
+    } 
+    else if(keys.s.pressed && lastkey === 's') {
+
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i]
+            //how player connect with collision
+            if (
+                rectangularColission({
+                    rectangle1:player,
+                    rectangle2:{...boundary, 
+                        position: {
+                            x: boundary.position.x,
+                            y: boundary.position.y - 3
+                        }
+                    }
+                })
+            ) {console.log('colliding')
+                moving = false
+                break
+            }
+
+        }
+
+        if(moving) {
+            movables.forEach(movable => {movable.position.y -= 3})
+        }
+        
+    } 
+    else if(keys.d.pressed && lastkey === 'd') {
+
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i]
+            //how player connect with collision
+            if (
+                rectangularColission({
+                    rectangle1:player,
+                    rectangle2:{...boundary, 
+                        position: {
+                            x: boundary.position.x - 3,
+                            y: boundary.position.y
+                        }
+                    }
+                })
+            ) {console.log('colliding')
+                moving = false
+                break
+            }
+
+        }
+
+        if(moving) {
+            movables.forEach(movable => {movable.position.x -= 3})
+        }
+
+    } 
 
 
 }
@@ -112,23 +330,19 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('keyup', (e) => {
     switch(e.key) {
         case 'w':
-            console.log('w press')
             keys.w.pressed = false
         break
         
         case 'a':
-            console.log('a press')
             keys.a.pressed = false
         break
 
         case 's':
             keys.s.pressed = false
-            console.log('s press')
         break
 
         case 'd':
             keys.d.pressed = false
-            console.log('d press')
         break
 
     }

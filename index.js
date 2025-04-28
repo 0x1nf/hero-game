@@ -1,3 +1,5 @@
+console.log(user)
+console.log(`./images/${user.nft.color}Down.png`)
 console.log(collisions)
 const canvas = document.querySelector('canvas')
 
@@ -12,10 +14,6 @@ for (let i = 0; i < collisions.length; i += 70) {
     collisionsMap.push(collisions.slice(i, i + 70))
 }
 console.log(collisionsMap)
-
-
-
-
 
 
 //OFFSETS
@@ -55,16 +53,18 @@ const image = new Image()
 image.src = './images/elletTown.png'
 //PLAYER
 const playerDownImage = new Image()
-playerDownImage.src = './images/playerDown.png'
+playerDownImage.src = `./images/${user.nft.color}Down.png`
+//playerDownImage.src = './images/playerDown.png'
+
 //u
 const playerUpImage = new Image()
-playerUpImage.src = './images/playerUp.png'
+playerUpImage.src = `./images/${user.nft.color}Up.png`
 //r
 const playerRightImage = new Image()
-playerRightImage.src = './images/playerRight.png'
+playerRightImage.src = `./images/${user.nft.color}Right.png`
 //l
 const playerLeftImage = new Image()
-playerLeftImage.src = './images/playerLeft.png'
+playerLeftImage.src = `./images/${user.nft.color}Left.png`
 //FOREGROUND
 const foregroundImage = new Image()
 foregroundImage.src = './images/foregroundObjects.png'

@@ -16,23 +16,6 @@ console.log(collisionsMap)
 
 
 
-//TILE CLASS
-class Boundary {
-//MAKE STATIC SIZE. OUR TILES 12*12, OUR MAP ZOOM 400%, MULTIPLE IT = 48*48
-    static width = 48
-    static height = 48
-    constructor({position}) {
-        this.position = position
-        this.width = 48
-        this.height = 48
-    }
-
-    draw() {
-        c.fillStyle = 'red'
-        c.fillRect(this.position.x, this.position.y, this.width, this.height)
-    }
-}
-
 
 
 //OFFSETS
@@ -73,42 +56,10 @@ image.src = './images/elletTown.png'
 //PLAYER
 const playerImage = new Image()
 playerImage.src = './images/playerDown.png'
+//FOREGROUND
+const foregroundImage = new Image()
+foregroundImage.src = './images/foregroundObjects.png'
 
-
-//BASE CLASS SPRITE
-class Sprite {
-    constructor({position, velocity, image, frames = {max: 1} }) {
-        this.position = position
-        this.image = image
-        this.frames = frames
-        
-        this.image.onload = () => {
-            this.width = this.image.width / this.frames.max
-            this.height = this.image.height
-
-            console.log(this.width)
-            console.log(this.height)
-        }
-    }
-
-    draw() {
-        // c.drawImage(this.image, this.position.x, this.position.y)
-        //draw player
-        c.drawImage(
-            this.image,
-            0,
-            0,
-            this.image.width / this.frames.max,
-            this.image.height, 
-
-            this.position.x,
-            this.position.y,
-
-            this.image.width / this.frames.max,
-            this.image.height
-        )        
-    }
-}
 
 
 //PLAYER IMAGE
@@ -133,6 +84,15 @@ const background = new Sprite({
     image: image
 })
 
+//FOREGROUND
+const foreground = new Sprite({
+    position: {
+        x: offset.x,
+        y: offset.y
+    },
+    image: foregroundImage
+})
+
 const keys = {
     w: {
         pressed: false
@@ -151,7 +111,7 @@ const keys = {
 //array of all movable const
 
 
-const movables = [background, ...boundaries]
+const movables = [background, ...boundaries, foreground]
 
 function rectangularColission ({rectangle1, rectangle2}) {
     return (
@@ -177,6 +137,10 @@ function animate() {
 
     //draw player
     player.draw()
+    //draw foreground
+    foreground.draw()
+
+
 
     
 

@@ -54,8 +54,17 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 const image = new Image()
 image.src = './images/elletTown.png'
 //PLAYER
-const playerImage = new Image()
-playerImage.src = './images/playerDown.png'
+const playerDownImage = new Image()
+playerDownImage.src = './images/playerDown.png'
+//u
+const playerUpImage = new Image()
+playerUpImage.src = './images/playerUp.png'
+//r
+const playerRightImage = new Image()
+playerRightImage.src = './images/playerRight.png'
+//l
+const playerLeftImage = new Image()
+playerLeftImage.src = './images/playerLeft.png'
 //FOREGROUND
 const foregroundImage = new Image()
 foregroundImage.src = './images/foregroundObjects.png'
@@ -69,9 +78,15 @@ const player = new Sprite({
         x: canvas.width / 2 - 192 / 4 / 2,
         y: canvas.height / 2 - 68 / 2
     },
-    image: playerImage,
+    image: playerDownImage,
     frames: {
         max: 4
+    },
+    sprites: {
+        up: playerUpImage,
+        right: playerRightImage,
+        left: playerLeftImage,
+        down: playerDownImage
     }
 })
 
@@ -148,9 +163,15 @@ function animate() {
 ////////////////////
 //HOTKEYS CONTROLL//
 ////////////////////
+
+//variable for moving detect buy pressed hotkey
 let moving = true
+//player animation
+player.moving = false
 
     if(keys.w.pressed && lastkey === 'w') {
+        player.moving = true
+        player.image = player.sprites.up
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             //how player connect with collision
@@ -176,7 +197,8 @@ let moving = true
         }
     }
     else if(keys.a.pressed && lastkey === 'a') {
-
+        player.moving = true
+        player.image = player.sprites.left
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             //how player connect with collision
@@ -204,7 +226,8 @@ let moving = true
         
     } 
     else if(keys.s.pressed && lastkey === 's') {
-
+        player.moving = true
+        player.image = player.sprites.down
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             //how player connect with collision
@@ -231,7 +254,8 @@ let moving = true
         
     } 
     else if(keys.d.pressed && lastkey === 'd') {
-
+        player.moving = true
+        player.image = player.sprites.right
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             //how player connect with collision

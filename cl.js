@@ -20,10 +20,11 @@ class Boundary {
 
 //BASE CLASS SPRITE
 class Sprite {
-    constructor({position, velocity, image, frames = {max: 1} }) {
+    constructor({position, velocity, image, frames = {max: 1}, sprites}) {
         this.position = position
         this.image = image
-        this.frames = frames
+        this.frames = {...frames, val: 0, elapsed: 0}
+        
         
         this.image.onload = () => {
             this.width = this.image.width / this.frames.max
@@ -32,6 +33,8 @@ class Sprite {
             console.log(this.width)
             console.log(this.height)
         }
+        this.moving = false
+        this.sprites = sprites
     }
 
     draw() {
@@ -39,7 +42,9 @@ class Sprite {
         //draw player
         c.drawImage(
             this.image,
-            0,
+            //x-cords
+            this.frames.val * this.width,
+            //y-cords
             0,
             this.image.width / this.frames.max,
             this.image.height, 
@@ -49,7 +54,20 @@ class Sprite {
 
             this.image.width / this.frames.max,
             this.image.height
-        )        
+        )
+        
+        //no animation
+        if(!this.moving) return
+        //setting 10shots animation, with elapsed props
+        if(this.frames.max > 1) {
+            this.frames.elapsed++
+        }
+
+        if (this.frames.elapsed %10 === 0) {
+            if (this.frames.val < this.frames.max -1) this.frames.val++
+            else this.frames.val = 0
+        }
+
     }
 }
 

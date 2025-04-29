@@ -1,10 +1,11 @@
 const user = {
     id: 123,
-    username: "Pedro",
+    username: 'Pedro',
     nft: {
         holder: true,
-        skin: "Simple",
-        color: "blue",
-        weapon: "bone"
+        skin: 'Simple',
+        color: 'blue',
+        weapon: 'bone',
+        pet: 'orangecat'
     }
 }

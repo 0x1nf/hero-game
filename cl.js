@@ -69,5 +69,31 @@ class Sprite {
         }
 
     }
+
+    drawPet() {
+        //draw pet
+        c.drawImage(
+            this.image,
+            //x-cords
+            this.frames.val * this.width,
+            //y-cords
+            0,
+            this.image.width / this.frames.max,
+            this.image.height, 
+
+            this.position.x,
+            this.position.y,
+
+            this.image.width / this.frames.max,
+            this.image.height
+        )
+        if(this.frames.max > 1) {
+            this.frames.elapsed++
+        }
+        if(this.frames.elapsed % 10 === 0) {
+            if(this.frames.val < this.frames.max - 1)this.frames.val++
+            else this.frames.val = 0
+        }
+    }
 }
 

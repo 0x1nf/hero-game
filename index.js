@@ -81,6 +81,9 @@ image.src = './images/elletTown.png'
 //PLAYER
 const playerDownImage = new Image()
 playerDownImage.src = `./images/${user.nft.color}Down.png`
+//PET
+const petImage = new Image()
+petImage.src = `./images/pet${user.nft.pet}.png`
 //u
 const playerUpImage = new Image()
 playerUpImage.src = `./images/${user.nft.color}Up.png`
@@ -134,7 +137,24 @@ const weapon = new Sprite({
         left: '',
         down: ''
     }
+})
 
+const pet = new Sprite({
+    position: {
+        //192*68 its player image(all position) file size
+        x: canvas.width / 2 - 192 / 3.5,
+        y: canvas.height / 2 - 68 / 2
+    },
+    image: petImage,
+    frames: {
+        max: 4
+    },
+    sprites: {
+        up: '',
+        right: '',
+        left: '',
+        down: ''
+    }
 })
 
 //BG IMAGE
@@ -205,6 +225,7 @@ function animate() {
     //draw player
     player.draw()
     weapon.draw()
+    pet.drawPet()
     //draw foreground
     foreground.draw()
 

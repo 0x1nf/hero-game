@@ -15,6 +15,13 @@ for (let i = 0; i < collisions.length; i += 70) {
 }
 console.log(collisionsMap)
 
+//RENDER BATTLEZONES MAP
+const battleZonesMap = []
+for (let i = 0; i < battleZonesData.length; i += 70) {
+    battleZonesMap.push(battleZonesData.slice(i, i + 70))
+}
+console.log(battleZonesMap)
+
 
 //OFFSETS
 const offset = {
@@ -41,8 +48,28 @@ collisionsMap.forEach((row, i) => {
         }        
     })
 })
-
 console.log(boundaries)
+
+const battleZones = []
+
+battleZonesMap.forEach((row, i) => {
+    //sort each height array Y position, but not 0 empty value
+    row.forEach((symbol, j) => {
+        if(symbol === 1025) {
+            battleZones.push(
+                new Boundary ({
+                    //multiple Y=i and X=j cords for tile size 48                
+                    position:{
+                        x: j * Boundary.width + offset.x,
+                        y: i * Boundary.height + offset.y
+                    }
+                })
+            )
+        }        
+    })
+})
+console.log(battleZones)
+
 
 
 c.fillStyle = 'orange'
@@ -54,8 +81,6 @@ image.src = './images/elletTown.png'
 //PLAYER
 const playerDownImage = new Image()
 playerDownImage.src = `./images/${user.nft.color}Down.png`
-//playerDownImage.src = './images/playerDown.png'
-
 //u
 const playerUpImage = new Image()
 playerUpImage.src = `./images/${user.nft.color}Up.png`
@@ -65,6 +90,9 @@ playerRightImage.src = `./images/${user.nft.color}Right.png`
 //l
 const playerLeftImage = new Image()
 playerLeftImage.src = `./images/${user.nft.color}Left.png`
+//wep
+const weaponImage = new Image()
+weaponImage.src = `./images/weapon${user.nft.weapon}.png`
 //FOREGROUND
 const foregroundImage = new Image()
 foregroundImage.src = './images/foregroundObjects.png'
@@ -88,6 +116,25 @@ const player = new Sprite({
         left: playerLeftImage,
         down: playerDownImage
     }
+})
+
+const weapon = new Sprite({
+    position: {
+        //192*68 its player image(all position) file size
+        x: canvas.width / 2 - 192 / 4 / 2,
+        y: canvas.height / 2 - 68 / 2
+    },
+    image: weaponImage,
+    frames: {
+        max: 4
+    },
+    sprites: {
+        up: '',
+        right: '',
+        left: '',
+        down: ''
+    }
+
 })
 
 //BG IMAGE
@@ -126,7 +173,7 @@ const keys = {
 //array of all movable const
 
 
-const movables = [background, ...boundaries, foreground]
+const movables = [background, ...boundaries, foreground, ...battleZones]
 
 function rectangularColission ({rectangle1, rectangle2}) {
     return (
@@ -150,8 +197,14 @@ function animate() {
         boundary.draw()
     })
 
+    //draw battlezone map
+    battleZones.forEach(battleZone => {
+        battleZone.draw()
+    })
+
     //draw player
     player.draw()
+    weapon.draw()
     //draw foreground
     foreground.draw()
 
@@ -168,9 +221,11 @@ function animate() {
 let moving = true
 //player animation
 player.moving = false
+weapon.moving = false
 
     if(keys.w.pressed && lastkey === 'w') {
         player.moving = true
+        weapon.moving = true
         player.image = player.sprites.up
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
@@ -196,6 +251,7 @@ player.moving = false
             movables.forEach(movable => {movable.position.y += 3})
         }
     }
+    
     else if(keys.a.pressed && lastkey === 'a') {
         player.moving = true
         player.image = player.sprites.left
@@ -216,17 +272,16 @@ player.moving = false
                 moving = false
                 break
             }
-
         }
 
         if(moving) {
             movables.forEach(movable => {movable.position.x += 3})
-        }
-
-        
+        }        
     } 
+
     else if(keys.s.pressed && lastkey === 's') {
         player.moving = true
+        weapon.moving = true
         player.image = player.sprites.down
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
@@ -245,14 +300,13 @@ player.moving = false
                 moving = false
                 break
             }
-
         }
 
         if(moving) {
             movables.forEach(movable => {movable.position.y -= 3})
-        }
-        
+        }        
     } 
+
     else if(keys.d.pressed && lastkey === 'd') {
         player.moving = true
         player.image = player.sprites.right
@@ -273,16 +327,12 @@ player.moving = false
                 moving = false
                 break
             }
-
         }
 
         if(moving) {
             movables.forEach(movable => {movable.position.x -= 3})
         }
-
     } 
-
-
 }
 animate()
 

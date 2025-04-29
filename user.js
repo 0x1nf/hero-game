@@ -4,6 +4,7 @@ const user = {
     nft: {
         holder: true,
         skin: "Simple",
-        color: "blue"
+        color: "blue",
+        weapon: "bone"
     }
 }

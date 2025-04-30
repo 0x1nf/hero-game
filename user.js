@@ -6,6 +6,6 @@ const user = {
         skin: 'Simple',
         color: 'blue',
         weapon: 'bone',
-        pet: 'orangecat'
+        pet: 'flwr'
     }
 }

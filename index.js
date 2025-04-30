@@ -238,6 +238,33 @@ function animate() {
 //HOTKEYS CONTROLL//
 ////////////////////
 
+//ANOTHER BATTLEZONE, HALF PLAYER IMAGE COLLISION
+if(keys.w.pressed || keys.a.pressed || keys.s.pressed || keys.d.pressed) {
+    for (let i = 0; i < battleZones.length; i++) {
+        const battleZone = battleZones[i]
+        //hard geometry things with colliding player with battlezones
+        const overlappingArea = 
+        (Math.min(player.position.x + player.width, battleZone.position.x + battleZone.width) 
+        - Math.max(player.position.x, battleZone.position.x))
+        * (Math.min(player.position.y + player.height, battleZone.position.y + battleZone.height)
+        - Math.max(player.position.y, battleZone.position.y))
+
+        //how player connect with battlezone collision
+        if (
+            rectangularColission({
+                rectangle1: player,
+                rectangle2: battleZone
+            }) &&
+            //with math random chance to start detecting colliding, when player on zone random 1=100%, now 0.02 = 2%
+            overlappingArea > (player.width * player.height) / 2
+            && Math.random() < 0.02
+        ) {
+            console.log('colliding battle zone')
+            break
+        }
+    }
+}
+
 //variable for moving detect buy pressed hotkey
 let moving = true
 //player animation
@@ -253,19 +280,19 @@ weapon.moving = false
             //how player connect with collision
             if (
                 rectangularColission({
-                    rectangle1:player,
-                    rectangle2:{...boundary, 
+                    rectangle1: player,
+                    rectangle2: {...boundary, 
                         position: {
                             x: boundary.position.x,
                             y: boundary.position.y + 3
                         }
                     }
                 })
-            ) {console.log('colliding')
+            ) {
+                console.log('colliding')
                 moving = false
                 break
             }
-
         }
 
         if(moving) {

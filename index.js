@@ -71,10 +71,6 @@ battleZonesMap.forEach((row, i) => {
 console.log(battleZones)
 
 
-
-c.fillStyle = 'orange'
-c.fillRect(0, 0, canvas.width, canvas.height)
-
 //BACKGROUND
 const image = new Image()
 image.src = './images/elletTown.png'
@@ -206,6 +202,10 @@ function rectangularColission ({rectangle1, rectangle2}) {
 
 }
 
+const battle = {
+    initiated:false
+}
+
 //REFRESH ANIMATION
 function animate() {
     window.requestAnimationFrame(animate)
@@ -227,17 +227,20 @@ function animate() {
     weapon.draw()
     pet.drawPet()
     //draw foreground
-    foreground.draw()
-
-
-
-    
+    foreground.draw()    
 
 
 ////////////////////
 //HOTKEYS CONTROLL//
 ////////////////////
 
+//variable for moving detect buy pressed hotkey
+let moving = true
+//player animation
+player.moving = false
+weapon.moving = false
+
+if(battle.initiated) return
 //ANOTHER BATTLEZONE, HALF PLAYER IMAGE COLLISION
 if(keys.w.pressed || keys.a.pressed || keys.s.pressed || keys.d.pressed) {
     for (let i = 0; i < battleZones.length; i++) {
@@ -259,17 +262,27 @@ if(keys.w.pressed || keys.a.pressed || keys.s.pressed || keys.d.pressed) {
             overlappingArea > (player.width * player.height) / 2
             && Math.random() < 0.02
         ) {
-            console.log('colliding battle zone')
+            console.log('battle zone activated')
+            battle.initiated = true
+            //activate animation for overlaying div with battle
+            gsap.to('#ol', {
+                opacity: 1,
+                repeat: 3,
+                yoyo: true,
+                duration: 0.4,
+                onComplete() {
+                    gsap.to('#ol', {
+                        opacity: 1,
+                        duration: 2,
+                    })
+                }
+            })
+            
             break
         }
     }
 }
 
-//variable for moving detect buy pressed hotkey
-let moving = true
-//player animation
-player.moving = false
-weapon.moving = false
 
     if(keys.w.pressed && lastkey === 'w') {
         player.moving = true
